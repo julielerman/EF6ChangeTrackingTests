@@ -65,12 +65,28 @@ namespace Tests
     }
 
     [TestMethod]
-    public void ModifiedStateChildWillGetChangedToAdded() {
+    public void ModifiedStateChildWill_NOT_GetChangedToAdded() {
       var samurai = new Samurai();
+      var quote = new Quote();
+      samurai.Quotes.Add(quote);
       using (var context = new SamuraiContext()) {
-        context.Entry(samurai).State = EntityState.Modified;
+        context.Entry(quote).State = EntityState.Modified;
         context.Samurais.Add(samurai);
-        Assert.AreEqual(EntityState.Added, context.Entry(samurai).State);
+        Assert.AreEqual(EntityState.Modified, context.Entry(quote).State);
+        //This is not expected based on the docs
+      }
+    }
+
+    [TestMethod]
+    public void ModifiedStateChildWill_NOT_GetChangedToUnchanged() {
+      var samurai = new Samurai();
+      var quote = new Quote();
+      samurai.Quotes.Add(quote);
+      using (var context = new SamuraiContext()) {
+        context.Entry(quote).State = EntityState.Modified;
+        context.Samurais.Attach(samurai);
+        Assert.AreEqual(EntityState.Modified, context.Entry(quote).State);
+        //This is not expected based on the docs
       }
     }
 
@@ -87,7 +103,7 @@ namespace Tests
     }
 
     [TestMethod]
-    public void AddedStateChildWillNotGetChangedToUnchanged() {
+    public void AddedStateChildWill_NOT_GetChangedToUnchanged() {
       var samurai = new Samurai();
       var quote = new Quote();
       samurai.Quotes.Add(quote);
@@ -99,7 +115,7 @@ namespace Tests
     }
 
     [TestMethod]
-    public void AddedStateChildWillGetChangedToDetachedWhenRemoved() {
+    public void AddedStateChildGetsChangedToDetachedWhenRemoved() {
       var samurai = new Samurai();
       var quote = new Quote();
       samurai.Quotes.Add(quote);
